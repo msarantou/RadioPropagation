@@ -8,7 +8,7 @@
    mode:           0 for Transmitter, 1 for Receiver
    nAntennas:      Number of array antennas 
    spacing:        The spacing between the array antennas 
-   position:       The vector for the initial position in cartesian coordinates [x,y,z] in [m]
+   position:       The vector for the initial position of the MT in cartesian coordinates [x,y,z] in [m]
    simulation_par  The parameters calculated in the class "Simulation_Parameters.py"
 
 
@@ -16,11 +16,11 @@
    * Function elementPositionsCalc()
      Allocate the array's antennas (only along y axis) in the 3D cartesian space for the Tx/Rx, 
      in respect to the antenna spacing and Tx/Rx initial position.
-        elementPositions: a vector [x,y,z] which contains the position of each array antenna 
+        elementPositions: a vector [x,y,z] which contains the position of each array's antenna allocated along y axis
 
    * Function Track()
      Calculates the MT's track.
-        track: a vector [x,y,z] which contains the positions of the MT along its track
+        track: a vector [x,y,z] which contains the positions of the MT along its track for each antenna element
     
 """
  
@@ -39,7 +39,7 @@ class Transceceiver():
         self.position = position
         self.elementPositions = np.zeros((self.nAntennas,3))   
         if (self.mode == 1):
-            self.track = np.zeros((self.Nsamples,3))        
+            self.track = np.zeros((self.nAntennas,self.Nsamples,3))        
         
         
 
@@ -49,28 +49,24 @@ class Transceceiver():
         j = -halfWidth
 
         for i in range (self.nAntennas):
-            
-            self.elementPositions[i,0] = self.position[0]
-            self.elementPositions[i,1] = self.position[1]-j*self.spacing
-            self.elementPositions[i,2] = self.position[2]
+            # Allocate MT's antennas along y axis
+            self.elementPositions[i,:] = [self.position[0],self.position[1]-j*self.spacing,self.position[2]]
             j+=1
 
 
     def Track(self):
 
-        if (self.mode == 1):                                                                      
-
-            px = self.position[0]                                  # Initial Position of MT
-            py = self.position[1]
-            pz = self.position[2]
-
-            for i in range(self.Nsamples):
-                    
-                self.track[i,:] = [px+self.velocity[0]*self.ts,py+self.velocity[1]*self.ts,pz+self.velocity[2]*self.ts]
-                px = self.track[i,0]                               # Updated Positions
-                py = self.track[i,1]
-                pz = self.track[i,2]
+        if (self.mode == 1): 
+          
+          for i in range (self.nAntennas):
+                # Initial Position of each MT's antenna element 
+                self.track[i,0,:] = [self.elementPositions[i,0],self.elementPositions[i,1],self.elementPositions[i,2]]
             
+          for i in range (self.nAntennas):
+                for j in range (1,self.Nsamples):
+                      # Update Position of each MT's antenna element  
+                      self.track[i,j,:] = [self.track[i,j-1,0]+self.velocity[0]*self.ts,self.track[i,j-1,1]+self.velocity[1]*self.ts,self.track[i,j-1,2]+self.velocity[2]*self.ts]
+                  
 
         else:
             print ("??? Error: A moving BS is not supported!")

@@ -65,9 +65,9 @@ for i in range (-1,2):
 MTxi0 = (MT_antenna * sin(np.radians(180))) + MTx                     # Allocate MT antennas along y axis. MTxi0 is the initial location of the MT route
 MTyi = (MT_antenna * cos(np.radians(180))) + MTy
 
-MTxi = 
-# MTxi = MTxi * spaceaxis
-# MTyi = np.zeros(Nsamples)
+ 
+MTxi = MTxi * spaceaxis
+MTyi = np.zeros(Nsamples)
 
 plt.plot(BSxi,BSyi/lamda,'k^')
 plt.plot(MTxi,MTyi/lamda,'r^')
