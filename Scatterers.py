@@ -5,7 +5,8 @@
 
  Inputs:
    NSC:            Number of point scatterers
-   radius:         The radius of the circle 
+   radius:         The radius of the circle
+   avPower:        The average power in [dB] from "Simulation_Parameters.py" class 
    
 
 

@@ -19,7 +19,6 @@
    Dx:             Sampling spacing in [m]
    ts:             Time sampling interval in [s]   
    fs:             Sampling frequency in [Hz]
-   fm:             Max Doppler shift
    Nsamples:       Number of samples along the MT track 
 
 """
@@ -43,7 +42,6 @@ class SimulationParameters:
         self.Dx = self.lamda/self.F                                      
         self.ts = self.Dx/self.speed                                         
         self.fs = 1/self.ts                                              
-        self.fm = self.speed/self.lamda  
         self.Nsamples = int(self.dist/self.Dx)                                 
 
 
