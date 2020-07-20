@@ -8,6 +8,7 @@
  Inputs:
    NSC:            Number of point scatterers
    radius:         The radius of the circle for each Circular Scatterer
+   n:              Reflection Coefficient for the scatterer
    
 
 
@@ -22,7 +23,7 @@ from random import uniform
 
 class CircularScatterers():
     
-    def __init__(self,NSC,radius):
+    def __init__(self,NSC,radius,n):
         
         self.NSC = NSC
         self.radius = radius
@@ -32,5 +33,4 @@ class CircularScatterers():
             self.CSCx[i] = uniform(2.0, 10.0)
             self.CSCy[i] = uniform(-100.0, 100.0)
         
-         
                                    

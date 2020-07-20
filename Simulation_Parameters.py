@@ -6,7 +6,7 @@
  Inputs:
    fc:             Center Frequency in [Hz]
    avPower:        Average Power in [dB]
-   F:              Sampling rate as a fraction of wavelength 
+   F:              Sampling rate as a fraction of wavelength for the MT's track
                      Sampling rate describes the number of samples per wavelenght. 
                      To fulfill the sampling theorem the minimum sample desnity must be 2.
    V:              The vector for the velocity of the MT [Vx,Vy,Vz] in [m/s] 
