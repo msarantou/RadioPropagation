@@ -1,0 +1,32 @@
+# This file initialize all the parameters for the simulation
+
+import numpy as np
+import Simulation_Par as sp
+
+# Simulation_Par
+fc = 2e9
+parameters = sp.SimulationParameters(fc)                        
+lamda = parameters.lamda
+
+# Transceivers: Α Transmitter with 1 antenna element which is located to the coodinates origin
+mode = 0
+nAntennas = 1
+spacing = lamda
+position = [0,0,0]
+
+# Antenna_Pattern: A Half- Wavelength Verical Dipole with Scanning interval for theta (atheta), phi=0 and 
+#  r=(2*D^2)/λ as the minimum limit for the Far Field.
+type = 0
+length = 1/2
+I0 = 1
+mode = 0
+thetaStep = 1
+atheta = np.arange((-np.pi/2)+1e-10,np.pi/2,thetaStep*np.pi/180.0)
+r = (2*(lamda/2)**2)/lamda
+phi = 0
+
+# Circular_Scatterers: 100 Circular Scatterers of radius=0.05 and Scattering Coefficient=-1
+NSC = 1000
+radius = 0.05
+n = -1
+

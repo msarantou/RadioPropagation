@@ -8,7 +8,7 @@
    mode:           0 for Transmitter, 1 for Receiver
    nAntennas:      Number of array antennas 
    spacing:        The spacing between the array antennas 
-   position:       The vector for the initial position of the MT in cartesian coordinates [x,y,z] in [m]
+   position:       The vector for the BS position or the MT's initial position in cartesian coordinates [x,y,z] in [m]
    simulation_par  The parameters calculated in the class "Simulation_Parameters.py"
 
 
