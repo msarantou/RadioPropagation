@@ -51,6 +51,7 @@ plt.grid()
 ## Generate Circular Scatterers: Call for Circular_Scatterers Class
 
 scat = sc.CircularScatterers(config.NSC,config.radius,config.n)
+NSC = scat.NSC
 CSCx = scat.CSCx
 CSCy = scat.CSCy
 fig, ax = plt.subplots(1, 1)
@@ -78,18 +79,29 @@ plt.title('Dipole λ/2 - Radiation Intensity')
 Nrays = len(thetaInterval)
 # All Rays origin is:
 A = [BSx[0],BSy[0]]
-# Total number of intersection points
-nInterPoints = 0
+# An array that stores the intersection points (the new origin of the reflected ray)
+Ar = []
+# An array for the new angle of reflection (90°-atheta)
+a = []
 for i in tqdm(range(Nrays)):
     # Direction vector for any line with origin (0,0)
     B = [1,np.tan(thetaInterval[i])]
-    nInterPoints+= rays.intersection(A,B,scat)
-print(nInterPoints)
-    
-     
+    for jj in range (NSC):
+        # x-y coordinates for the Center of each Circular Scatterer
+        Cx = CSCx[jj]
+        Cy = CSCy[jj]
+        C = [Cx,Cy]
+        t = rays.intersection(A,B,C,scat.radius)
+        if (t!=False):
+            Ar.append(t)
+            a.append(0.5*np.pi-config.atheta[i])
 
+# Total number of reflected rays
+Nr = len(Ar)
+for k in range (Nr):
+    Br = [1,np.tan(a[k])]
 
-plt.show()
+# plt.show()
 
        
 

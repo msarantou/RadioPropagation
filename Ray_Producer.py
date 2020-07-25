@@ -22,14 +22,16 @@
    
 
    * Function intersection(A,B,scat)
-     This function is called for each Transmitted Ray, and check if it has Intersection Points with all the Scatterers.
+     This function is called for each Transmitted Ray and each Scatterer, and check if there is an Intersection Point between them.
      The Ray-Sphere Intersection method is applied. It receives as input the Ray's origin (A), the Ray's direction vector (B) 
-     and all the Circular_Scatterers parameters.
+     and the center, radius of each Circular Scatterer. If there are two Intersection Points, we choose one of those randomly.
         nPoints:        How many Intercection Points a single Ray hitted with all the Scatterers. 
    
 """
 
 import numpy as np
+import random
+from numpy import sqrt
 
 class Ray():
 
@@ -49,22 +51,20 @@ class Ray():
         self.HPBW = (np.amax(self.thetaHPBW)+np.abs(np.amin(self.thetaHPBW)))
 
 
-    def intersection(self,A,B,scat):
+    def intersection(self,A,B,C,radius):
           
-          NSC = scat.NSC
           a = np.dot(B,B)
-          nPoints = 0
-          for jj in range (NSC):
-                
-                Cx = scat.CSCx[jj]
-                Cy = scat.CSCy[jj]
-                # x-y coordinates for the Center of each Circular Scatterer
-                C = [Cx,Cy]
-                b = 2*np.dot(B,np.subtract(A,C))
-                c = np.dot(np.subtract(A,C),np.subtract(A,C))-scat.radius**2
-                if (b**2-4*a*c)>=0:
-                      nPoints+= 1
-          return(nPoints)
+          b = 2*np.dot(B,np.subtract(A,C))
+          c = np.dot(np.subtract(A,C),np.subtract(A,C))-radius**2
+          delta = b**2-4*a*c
+          if (delta)>=0:
+                # Calculate the Intersection Point 
+                t1 = (-b+sqrt(delta))/(2*a)
+                t2 = (-b-sqrt(delta))/(2*a)
+                t = random.choice([t1, t2])
+                return(t)
+          else:
+                return(False)
           
                       
                 
