@@ -9,10 +9,10 @@ parameters = sp.SimulationParameters(fc)
 lamda = parameters.lamda
 
 # Transceivers: Α Transmitter with 1 antenna element which is located to the coodinates origin
-mode = 0
-nAntennas = 1
-spacing = lamda
-position = [0,0,0]
+Tmode = 0
+TnAntennas = 1
+Tspacing = lamda
+Tposition = [0,0,0]
 
 # Antenna_Pattern: A Half- Wavelength Verical Dipole with Scanning interval for theta (atheta), phi=0 and 
 #  r=(2*D^2)/λ as the minimum limit for the Far Field.
@@ -24,6 +24,12 @@ thetaStep = 1
 atheta = np.arange((-np.pi/2)+1e-10,np.pi/2,thetaStep*np.pi/180.0)
 r = (2*(lamda/2)**2)/lamda
 phi = 0
+
+# Transceivers: Α Receiver with 1 antenna element which is located to the coodinates origin
+Rmode = 1
+RnAntennas = 1
+Rspacing = lamda
+Rposition = [20,0,0]
 
 # Circular_Scatterers: 100 Circular Scatterers of radius=0.05 and Scattering Coefficient=-1
 NSC = 1000

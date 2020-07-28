@@ -21,11 +21,12 @@
                         to find the half-power beamwidth we have to find the anglular interval in which U > Umax/2.
    
 
-   * Function intersection(A,B,scat)
+   * Function intersection(A,B,C,radius)
      This function is called for each Transmitted Ray and each Scatterer, and check if there is an Intersection Point between them.
      The Ray-Sphere Intersection method is applied. It receives as input the Ray's origin (A), the Ray's direction vector (B) 
-     and the center, radius of each Circular Scatterer. If there are two Intersection Points, we choose one of those randomly.
-        nPoints:        How many Intercection Points a single Ray hitted with all the Scatterers. 
+     and the center, radius of each Circular Scatterer. If there are two Intersection Points, we choose one of those randomly. 
+     The function returns:
+        x,y:        The x,y components of the Intersection Point between a Transmitted Ray and a corresponding Scatterer. 
    
 """
 
@@ -53,18 +54,22 @@ class Ray():
 
     def intersection(self,A,B,C,radius):
           
+          L = np.subtract(A,C)
           a = np.dot(B,B)
-          b = 2*np.dot(B,np.subtract(A,C))
-          c = np.dot(np.subtract(A,C),np.subtract(A,C))-radius**2
-          delta = b**2-4*a*c
+          b = 2*np.dot(B,L)
+          c = np.dot(L,L)-radius**2
+          delta = b*b-4*a*c
+          delta = round(delta,2)
           if (delta)>=0:
                 # Calculate the Intersection Point 
                 t1 = (-b+sqrt(delta))/(2*a)
                 t2 = (-b-sqrt(delta))/(2*a)
-                t = random.choice([t1, t2])
-                return(t)
+                t = random.choice([t1, t2]) 
+                x = A[0] + t*B[0]
+                y = A[1] + t*B[1]
+                return x,y
           else:
-                return(False)
+                return(False, False)
           
                       
                 

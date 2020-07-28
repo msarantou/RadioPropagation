@@ -1,8 +1,8 @@
 """
 
  DESCRIPTION
- This class controls the Transmitter and Receiver topologies. 
- Currently, the array antennas could be allocated only along y axis and only the MT can move.
+ This class controls the Transmitter topology. 
+ Currently, the array antennas could be allocated only along y axis.
 
  Inputs:
    mode:           0 for Transmitter, 1 for Receiver
@@ -22,7 +22,7 @@
 
 import numpy as np
 
-class Transceceiver():
+class Transceiver():
 
     def __init__(self,mode,nAntennas,spacing,position,simulation_par):
 
@@ -30,10 +30,13 @@ class Transceceiver():
         self.nAntennas = nAntennas
         self.spacing = spacing
         self.position = position
-        self.elementPositions = np.zeros((self.nAntennas,3))   
+        lamda = simulation_par.lamda
+        self.elementPositions = np.zeros((self.nAntennas,3))
         if (self.mode == 1):
-            self.track = np.zeros((self.nAntennas,self.Nsamples,3))        
-        
+          # self.r = (2*(lamda/2)**2)/lamda
+          self.r = 11
+          self.C = self.position
+
         
 
     def elementPositionsCalc(self):                                    
