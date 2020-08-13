@@ -2,7 +2,8 @@
 
  DESCRIPTION
  This class produces the Transmitted Rays interval for the tracing and check if there are Intersection Points 
- with the Circular Scatterers. We assume that Rays are generated only throughout the HPBW interval. 
+ with the Circular Scatterers and/or the Receiver. We assume that Rays are generated only throughout the HPBW 
+ interval and only one bounce via a Scatterer is feasible. 
  
 
  Inputs:
@@ -22,11 +23,16 @@
    
 
    * Function intersection(A,B,C,radius)
-     This function is called for each Transmitted Ray and each Scatterer, and check if there is an Intersection Point between them.
-     The Ray-Sphere Intersection method is applied. It receives as input the Ray's origin (A), the Ray's direction vector (B) 
-     and the center, radius of each Circular Scatterer. If there are two Intersection Points, we choose one of those randomly. 
-     The function returns:
-        x,y:        The x,y components of the Intersection Point between a Transmitted Ray and a corresponding Scatterer. 
+     This function is called to check for Intersection Points between a line (a Ray) and a circle (Scatterer or Receiver).
+     The Ray-Circle Intersection method is applied. It receives as input the Ray's origin (A), the Ray's direction vector (B) 
+     and the center, radius of each Circular object. If there are two Intersection Points, we choose one of those randomly. 
+     If there is an Intersection Point between the Transmitted Ray - Scatterer, the function returns:
+        x,y,Rr:        The x,y components of the Intersection Point and the Direction vector of the Reflected Ray.
+    If there is an Interection Point between the Scatterer - Receiver, the function returns:
+        x,y:           The x,y components of the Intersection Point
+        
+    
+
    
 """
 
@@ -52,7 +58,7 @@ class Ray():
         self.HPBW = (np.amax(self.thetaHPBW)+np.abs(np.amin(self.thetaHPBW)))
 
 
-    def intersection(self,A,B,C,radius):
+    def intersection(self,A,B,C,radius,bounce):
           
           L = np.subtract(A,C)
           a = np.dot(B,B)
@@ -61,17 +67,32 @@ class Ray():
           delta = b*b-4*a*c
           delta = round(delta,2)
           if (delta)>=0:
-                # Calculate the Intersection Point 
+                # Calculate the Intersection Point P[x,y] (hit point)
                 t1 = (-b+sqrt(delta))/(2*a)
                 t2 = (-b-sqrt(delta))/(2*a)
                 t = random.choice([t1, t2]) 
                 x = A[0] + t*B[0]
                 y = A[1] + t*B[1]
-                return x,y
+                # Calculate the Reflected Direction Vector Rr 
+                if (bounce == True):
+                      P = [x,y]
+                      N = np.abs(np.subtract(P,C))
+                      Nnorm = sqrt( (N[0])**2 + (N[1])**2 )
+                      N /= Nnorm
+                      Rinorm = sqrt(B[0]**2+B[1]**2)
+                      dot = np.dot(N,B)
+                      Rr = np.subtract(B,2*(np.dot(B,N))*N)
+                      return x,y,Rr
+                else:
+                      return x,y
           else:
-                return(False, False)
-          
-                      
+                if (bounce == True):
+                      return(False, False, False)
+                else:
+                      return (False,False)
+
+       
+               
                 
                       
                       

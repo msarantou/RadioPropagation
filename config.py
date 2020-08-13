@@ -10,7 +10,7 @@ lamda = parameters.lamda
 
 # Transceivers: Α Transmitter with 1 antenna element which is located to the coodinates origin
 Tmode = 0
-TnAntennas = 1
+TnAntennas = 2
 Tspacing = lamda
 Tposition = [0,0,0]
 
@@ -27,7 +27,7 @@ phi = 0
 
 # Transceivers: Α Receiver with 1 antenna element which is located to the coodinates origin
 Rmode = 1
-RnAntennas = 1
+RnAntennas = 2
 Rspacing = lamda
 Rposition = [20,0,0]
 

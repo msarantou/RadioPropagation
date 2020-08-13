@@ -8,6 +8,7 @@ import Antenna_Pattern as ap
 import Ray_Producer as rp
 import Circular_Scatterers as sc
 import config
+import pair as pr
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import sys
@@ -51,8 +52,8 @@ plt.grid()
 
 rx = tr.Transceiver(config.Rmode,config.RnAntennas,config.Rspacing,config.Rposition,parameters)                                   
 rx.elementPositionsCalc()                                                       
-MSx = rx.elementPositions[:,0]       
-MSy = rx.elementPositions[:,1] 
+MSx = rx.C[:,0]       
+MSy = rx.C[:,1] 
 N_Rx = rx.nAntennas                                                             
 plot3 = plt.figure(3)
 plt.plot(MSx,MSy,'k^')
@@ -88,35 +89,77 @@ plt.plot(thetaInterval, U[np.nonzero(U>(np.amax(U))/2)],'r',label='U > Umax/2 - 
 plt.legend(loc="center left")
 plt.title('Dipole λ/2 - Radiation Intensity')
 
+
+
+
+# Check for Intersection Intersection Point between Tx - Scatterer
 # The total number of Transmitted Rays:
 Nrays = len(thetaInterval)
-# Total distance Tx-Scatterer-Rx:
-dist = []
-# Rays origin is:
-A = [BSx[0],BSy[0]]
-for i in tqdm(range(Nrays)):
-    # Direction vector for any line 
-    B = [cos(thetaInterval[i]),sin(thetaInterval[i])]
-    for jj in range (NSC):
-        # coordinates for the Center of each Circular Scatterer
-        C = [CSCx[jj],CSCy[jj]]
-        # x,y for the Intersection Point Transmitted Ray-Scatterer
-        x,y = rays.intersection(A,B,C,scat.radius)
-        # Check for intersection point between Reflected Ray - Receiver
-        if (x!=False):
-            # The new origin of the Reflected Ray:
-            Ar = [x,y]
-            # The angle of reflection (90°-atheta):
-            a = 0.5*np.pi-thetaInterval[i]
-            Br = [cos(a),sin(a)]
-            xx,yy = rays.intersection(Ar,Br,[rx.C[0],rx.C[1]],rx.r)
+# Distance Tx-Scatterer:
+distBS_SC = []
+# P:x,y components for the Intersection Point 
+P = []
+# Br for the Direction vector of the Reflected Ray
+Br = []
+bounce = True
+for t in tqdm(range (N_Tx)):
+    P.append(pr.MyPair("Tx"+str(t)))
+    Br.append(pr.MyPair("Tx"+str(t)))
+    distBS_SC.append(pr.MyPair("Tx"+str(t)))
+    # Rays origin is:
+    A = [BSx[t],BSy[t]]
+    for i in range(Nrays):
+        # Direction vector for any line 
+        B = [cos(thetaInterval[i]),sin(thetaInterval[i])]
+        for jj in range (NSC):
+            # coordinates for the Center of each Circular Scatterer
+            C = [CSCx[jj],CSCy[jj]]
+            x,y,Rr = rays.intersection(A,B,C,scat.radius,bounce)
+            if (x!=False):
+                P[t].makepair(x,y)
+                Br[t].makepair(Rr[0],Rr[1])
+                distBS_SC[t].makepair(sqrt(((BSx[t]-x)**2) + ((BSy[t]-y)**2)),None)
+
+finaldist = []
+bounce = False 
+
+
+# plot1 = plt.figure(1)
+
+for t in range (N_Tx):
+    for r in range (N_Rx):
+        for i in range (len(P[t].data)):
+            xx,yy = rays.intersection(P[t].data[i].get(),Br[t].data[i].get(),[MSx[r],MSy[r]],rx.r,bounce)
             if (xx!=False):
-                distBS_SC = sqrt(((BSx[0]-x)**2) + ((BSy[0]-y)**2)) 
-                distSC_MT = sqrt(((x-xx)**2) + ((y-yy)**2))
-                dist.append(distBS_SC + distSC_MT)
+
+                hitX,hitY=P[t].data[i].get()
+                distSC_MT=(sqrt(((hitX-xx)**2) + ((hitY-yy)**2)))
+                finaldist.append(pr.MyPair("Tx"+str(t)+"Rx"+str(r)))
+                finaldist[-1].tx=t
+                finaldist[-1].rx=r
+                totDist=distBS_SC[t].data[i].get()[0]+distSC_MT 
+                finaldist[-1].makepair(totDist,None)
+                # ----------
+                # lx=[]
+                # ly=[]
+                # lx.append(BSx[t])
+                # ly.append(BSy[t])                
+                # lx.append(hitX)
+                # ly.append(hitY)
+                # lx.append(MSx[r])
+                # ly.append(MSy[r])
+                # plt.plot(lx,ly,linewidth= 0.2)
+    
+                
+                # ----------       
+                        
 
 
-# plt.show()
-
-       
+# plt.plot(BSx,BSy,'k^')
+# plt.plot(MSx,MSy,'r^')
+# plt.scatter(CSCx, CSCy, s=0.05)
+# plt.title('BS Antennas Position')
+# plt.xlabel('x [m]')
+# plt.ylabel('y [m]')
+plt.show()
 

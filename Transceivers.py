@@ -32,13 +32,9 @@ class Transceiver():
         self.position = position
         lamda = simulation_par.lamda
         self.elementPositions = np.zeros((self.nAntennas,3))
-        if (self.mode == 1):
-          # self.r = (2*(lamda/2)**2)/lamda
-          self.r = 11
-          self.C = self.position
-
         
 
+  
     def elementPositionsCalc(self):                                    
                                                                        
         halfWidth = self.nAntennas//2
@@ -49,4 +45,7 @@ class Transceiver():
             self.elementPositions[i,:] = [self.position[0],self.position[1]-j*self.spacing,self.position[2]]
             j+=1
 
-
+        if (self.mode == 1):
+              # self.r = (2*(lamda/2)**2)/lamda
+          self.r = 11
+          self.C = self.elementPositions
