@@ -3,3 +3,5 @@ __pyc*__
 /Vis/
 Vis
 *.nc
+.vscode/
+.DS_Store
