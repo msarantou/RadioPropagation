@@ -1,3 +1,5 @@
 *.txt
 __pyc*__
-
+/Vis/
+Vis
+*.nc

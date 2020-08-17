@@ -1,7 +1,7 @@
 """
 
  DESCRIPTION
- This class define the antenna type for the BS/ MT. Currently, only Finite Dipole Antennas are available 
+ This class define the antenna type for the BS. Currently, only Finite Dipole Antennas are available 
  and the simulation is 2D. That means that only polar radiation patterns are allowed: only the elevation 
  angle θ is varied, when phi and r are constant.
 

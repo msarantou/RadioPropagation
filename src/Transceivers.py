@@ -1,7 +1,7 @@
 """
 
  DESCRIPTION
- This class controls the Transmitter topology. 
+ This class controls the Transmitter/Receiver topology. 
  Currently, the array antennas could be allocated only along y axis.
 
  Inputs:

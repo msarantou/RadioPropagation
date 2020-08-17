@@ -22,14 +22,15 @@
                         to find the half-power beamwidth we have to find the anglular interval in which U > Umax/2.
    
 
-   * Function intersection(A,B,C,radius)
+   * Function intersection(A,B,C,radius,bounce)
      This function is called to check for Intersection Points between a line (a Ray) and a circle (Scatterer or Receiver).
      The Ray-Circle Intersection method is applied. It receives as input the Ray's origin (A), the Ray's direction vector (B) 
      and the center, radius of each Circular object. If there are two Intersection Points, we choose one of those randomly. 
-     If there is an Intersection Point between the Transmitted Ray - Scatterer, the function returns:
+     If there is an Intersection Point between the Transmitted Ray - Scatterer, the function returns (bounce=True):
         x,y,Rr:        The x,y components of the Intersection Point and the Direction vector of the Reflected Ray.
-    If there is an Interection Point between the Scatterer - Receiver, the function returns:
+     If there is an Interection Point between the Scatterer - Receiver, the function returns (bounce=False):
         x,y:           The x,y components of the Intersection Point
+   
         
     
 
