@@ -30,7 +30,7 @@ class CircularScatterers():
         self.CSCx = np.zeros(NSC)
         self.CSCy = np.zeros(NSC)
         for i in range (self.NSC):
-            self.CSCx[i] = uniform(2.0, 10.0)
-            self.CSCy[i] = uniform(-100.0, 100.0)
+            self.CSCx[i] = uniform(2.0, 18.0)
+            self.CSCy[i] = uniform(-15.0, 15.0)
         
                                    

@@ -30,9 +30,13 @@ class Transceiver():
         self.nAntennas = nAntennas
         self.spacing = spacing
         self.position = position
-        lamda = simulation_par.lamda
-        self.elementPositions = np.zeros((self.nAntennas,3))
-        
+        self.lamda = simulation_par.lamda
+        self.Nsamples = simulation_par.Nsamples
+        self.velocity = simulation_par.V
+        self.ts = simulation_par.ts
+        self.elementPositions = np.zeros((self.nAntennas,2))
+        if (self.mode == 1):
+            self.C = np.zeros((self.nAntennas,self.Nsamples,2))        
 
   
     def elementPositionsCalc(self):                                    
@@ -42,10 +46,28 @@ class Transceiver():
 
         for i in range (self.nAntennas):
             # Allocate MT's antennas along y axis
-            self.elementPositions[i,:] = [self.position[0],self.position[1]-j*self.spacing,self.position[2]]
+            self.elementPositions[i,:] = [self.position[0],self.position[1]-j*self.spacing]
             j+=1
 
         if (self.mode == 1):
-              # self.r = (2*(lamda/2)**2)/lamda
+          # self.r = (2*(self.lamda/2)**2)/self.lamda
           self.r = 11
-          self.C = self.elementPositions
+          # self.C = self.elementPositions
+    
+    def Track(self):
+    
+        if (self.mode == 1): 
+          
+          for i in range (self.nAntennas):
+                # Initial Position of each MT's antenna element 
+                self.C[i,0,:] = [self.elementPositions[i,0],self.elementPositions[i,1]]
+            
+          for i in range (self.nAntennas):
+                for j in range (1,self.Nsamples):
+                      # Update Position of each MT's antenna element  
+                      self.C[i,j,:] = [self.C[i,j-1,0]+self.velocity[0]*self.ts,self.C[i,j-1,1]+self.velocity[1]*self.ts]
+                  
+
+        else:
+            print ("??? Error: A moving BS is not supported!")
+    

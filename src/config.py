@@ -5,7 +5,10 @@ import Simulation_Par as sp
 
 # Simulation_Par
 fc = 2e9
-parameters = sp.SimulationParameters(fc)                        
+F = 8
+V = [10,0]
+dist = 5
+parameters = sp.SimulationParameters(fc,F,V,dist)                        
 lamda = parameters.lamda
 
 # Transceivers: Α Transmitter with 1 antenna element which is located to the coodinates origin
