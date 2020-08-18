@@ -6,7 +6,7 @@ import Simulation_Par as sp
 # Simulation_Par
 fc = 2e9
 F = 8
-V = [10,0]
+V = [10,-20]
 dist = 5
 parameters = sp.SimulationParameters(fc,F,V,dist)                        
 lamda = parameters.lamda
@@ -23,7 +23,7 @@ type = 0
 length = 1/2
 I0 = 1
 mode = 0
-thetaStep = 1
+thetaStep = 2
 atheta = np.arange((-np.pi/2)+1e-10,np.pi/2,thetaStep*np.pi/180.0)
 r = (2*(lamda/2)**2)/lamda
 phi = 0
@@ -32,10 +32,10 @@ phi = 0
 Rmode = 1
 RnAntennas = 2
 Rspacing = lamda
-Rposition = [20,0,0]
+Rposition = [5,20,0]
 
 # Circular_Scatterers: 100 Circular Scatterers of radius=0.05 and Scattering Coefficient=-1
 NSC = 1000
-radius = 0.05
+radius = 0.01
 n = -1
 

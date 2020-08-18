@@ -11,12 +11,17 @@ import config
 import pair as pr
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-import sys
-from Output import Save, OpenFile
+import sys , os
+from Output import Save, OpenFile, SaveTimesteps
 import netCDF4 as nc
 
 # The file in which all outputs are stored
-file="../Output/Output.nc"
+
+#Create Output Directory 
+Outdir="../Output/"
+if not os.path.exists(Outdir):
+    os.makedirs(Outdir)
+file=Outdir+ "SimulationSetup.nc"
 
 ## Basic parameters for the simulation: Call for Simulation_Par Class 
 parameters = sp.SimulationParameters(config.fc,config.F,config.V,config.dist)                        
@@ -79,13 +84,13 @@ P = []
 # Br for the Direction vector of the Reflected Ray
 Br = []
 bounce = True
-for t in tqdm(range (N_Tx)):
+for t in range (N_Tx):
     P.append(pr.MyPair("Tx"+str(t),rx = None))
     Br.append(pr.MyPair("Tx"+str(t),rx = None))
     distBS_SC.append(pr.MyPair("Tx"+str(t),rx = None))
     # Rays origin is:
     A = [BSx[t],BSy[t]]
-    for i in range(Nrays):
+    for i in tqdm(range(Nrays)):
         # Direction vector for any line 
         B = [cos(thetaInterval[i]),sin(thetaInterval[i])]
         for jj in range (NSC):
@@ -98,28 +103,33 @@ for t in tqdm(range (N_Tx)):
                 distBS_SC[t].makepair(sqrt(((BSx[t]-x)**2) + ((BSy[t]-y)**2)),None)
 
 # Check for Intersection Point between Scatterer - Receiver
-# Overall Distance Tx-Scatterer-Rx:
+# Overall Distance x-Scatterer-Rx:
 dist_BS_SC_MS = []
 lx=[]
 ly=[]
 bounce = False 
-# plot1 = plt.figure(1)
-for t in range (N_Tx):
-    for r in range (N_Rx):
-        for i in range (len(P[t].data)):
-            xx,yy = rays.intersection(P[t].data[i].get(),Br[t].data[i].get(),[MSx[r],MSy[r]],rx.r,bounce)
-            if (xx!=False):
-                hitX,hitY = P[t].data[i].get()
-                distSC_MT = (sqrt(((hitX-MSx)**2) + ((hitY-MSy)**2)))
-                dist_BS_SC_MS.append(pr.MyPair("Tx"+str(t),"Rx"+str(r)))
-                totDist = distBS_SC[t].data[i].get()[0]+distSC_MT 
-                dist_BS_SC_MS[-1].makepair(totDist,None)
-                lx.append(BSx[t])
-                ly.append(BSy[t])                
-                lx.append(hitX)
-                ly.append(hitY)
-                lx.append(MSx[r])
-                ly.append(MSy[r])
-Save(file,"Links","lx","ly",lx,ly)
-                
+
+for ts in tqdm(range(parameters.Nsamples)):    
+    for t in range (N_Tx):
+        for r in range (N_Rx):
+            for i in range (len(P[t].data)):
+                A=[ rx.C[r,ts,0],rx.C[r,ts,1] ]
+                xx,yy = rays.intersection(P[t].data[i].get(),Br[t].data[i].get(),A,rx.r,bounce)
+                if (xx!=False):
+                    hitX,hitY = P[t].data[i].get()
+                    distSC_MT = (sqrt(((hitX-MSx)**2) + ((hitY-MSy)**2)))
+                    dist_BS_SC_MS.append(pr.MyPair("Tx"+str(t),"Rx"+str(r)))
+                    totDist = distBS_SC[t].data[i].get()[0]+distSC_MT 
+                    dist_BS_SC_MS[-1].makepair(totDist,None)
+                    lx.append(BSx[t])
+                    ly.append(BSy[t])                
+                    lx.append(hitX)
+                    ly.append(hitY)
+                    lx.append(A[0])
+                    ly.append(A[1])
+    file= Outdir + "Timestep"+str(ts).zfill(7) +".nc"
+    if (ts%2 ==0):
+        SaveTimesteps(file,"Links","lx","ly",lx,ly)
+    lx.clear()
+    ly.clear()
                     

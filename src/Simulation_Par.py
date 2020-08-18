@@ -42,6 +42,8 @@ class SimulationParameters:
         self.ts = self.Dx/self.speed                                         
         self.fs = 1/self.ts                                              
         self.Nsamples = int(self.dist/self.Dx)                                      
+        self.Nsamples = 2000                                   
+        self.savefrequency=20
                                    
                               
 

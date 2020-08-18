@@ -29,3 +29,20 @@ def Save(filename,name1,var1,var2,value1,value2):
     data2[:] = value2
     ncout.close()
     return True 
+
+
+def SaveTimesteps(filename,name1,var1,var2,value1,value2):
+    
+
+    name = name1
+    namedata1 = var1
+    namedata2 = var2
+    ncout = nc.Dataset(filename,'w',format='NETCDF4')
+    ncout.createDimension(name,len(value1))
+    data1 = ncout.createVariable(namedata1,'f4',(name,))
+    data1[:] = value1
+    data2 = ncout.createVariable(namedata2,'f4',(name,))
+    data2[:] = value2
+    ncout.close()
+    return True 
+
