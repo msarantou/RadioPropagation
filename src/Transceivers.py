@@ -50,8 +50,9 @@ class Transceiver():
             j+=1
 
         if (self.mode == 1):
-          # self.r = (2*(self.lamda/2)**2)/self.lamda
-          self.r = 11
+
+          self.r = (2*(self.lamda/2)**2)/self.lamda
+          # self.r = 11
           # self.C = self.elementPositions
     
     def Track(self):

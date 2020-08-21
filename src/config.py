@@ -23,7 +23,7 @@ type = 0
 length = 1/2
 I0 = 1
 mode = 0
-thetaStep = 1
+thetaStep = 0.02
 atheta = np.arange((-np.pi/2)+1e-10,np.pi/2,thetaStep*np.pi/180.0)
 r = (2*(lamda/2)**2)/lamda
 phi = 0
@@ -35,7 +35,7 @@ Rspacing = lamda
 Rposition = [20,0,0]
 
 # Circular_Scatterers: 100 Circular Scatterers of radius=0.05 and Scattering Coefficient=-1
-NSC = 1000
+NSC = 3000
 radius = 0.05
 n = -1
 

@@ -92,11 +92,9 @@ for i in range (N_Rx):
                 distBS_SC_MT[i,j,k,p] = distBS_SC[j,k] + distSC_MT[i,k,p]       # Overall distance BS-MT through each Scatterer for each snapshot 
                 ray[i,j,k,p] = scat.a * cmath.exp(-1j*k*distBS_SC_MT[i,j,k,p])  # Signal's Complex Envelope
 
-
 H = np.sum(ray,axis=2)                                                          # Sum along axis 2 (Scatterers) which gives the overall signal                              
                                                                                 # corresponds to each path, for each snapshot
                                                                                 # r(N_Rx,N_Tx,snapshots)
-
 # Eigenvalues and Capacity Calculation
 
 Neigens = min(N_Rx,N_Tx)                                                        

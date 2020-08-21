@@ -13,6 +13,7 @@ from tqdm import tqdm
 import sys,os
 from Output import Save, OpenFile, SaveTimesteps
 import netCDF4 as nc
+import cmath
 
 # Create the Output Directory if does not exist
 if not os.path.exists("../Output"):
@@ -24,6 +25,7 @@ file = "../Output/SimulationSetUp.nc"
 ## Basic parameters for the simulation: Call for Simulation_Par Class 
 parameters = sp.SimulationParameters(config.fc,config.F,config.V,config.dist)                        
 lamda = parameters.lamda
+k = parameters.k
 
 ## Transmitter Topology: Call for Transceivers class
 tx = tr.Transceiver(config.Tmode,config.TnAntennas,config.Tspacing,config.Tposition,parameters)                                   
@@ -100,12 +102,14 @@ for t in tqdm(range (N_Tx)):
                 distBS_SC[t].makepair(sqrt(((BSx[t]-x)**2) + ((BSy[t]-y)**2)),None)
 
 # Check for Intersection Point between Scatterer - Receiver
-# Overall Distance Tx-Scatterer-Rx:
-dist_BS_SC_MS = []
 lx=[]
 ly=[]
+# Signal's complex envelope:
+ray = []
 bounce = False 
 Nsnapshots = parameters.Nsamples 
+# Channel Matrrix:
+H = np.zeros((Nsnapshots,N_Tx,N_Rx),dtype=complex)
 for ts in tqdm(range(Nsnapshots)):
     for t in range (N_Tx):
         for r in range (N_Rx):
@@ -113,20 +117,62 @@ for ts in tqdm(range(Nsnapshots)):
                 xx,yy = rays.intersection(P[t].data[i].get(),Br[t].data[i].get(),[rx.C[r,ts,0],rx.C[r,ts,1]],rx.r,bounce)
                 if (xx!=False):
                     hitX,hitY = P[t].data[i].get()
-                    distSC_MT = (sqrt(((hitX-MSx)**2) + ((hitY-MSy)**2)))
-                    dist_BS_SC_MS.append(pr.MyPair("Tx"+str(t),"Rx"+str(r)))
+                    distSC_MT = (sqrt(((hitX-MSx[r])**2) + ((hitY-MSy[r])**2)))
                     totDist = distBS_SC[t].data[i].get()[0]+distSC_MT 
-                    dist_BS_SC_MS[-1].makepair(totDist,None)
+                    ray.append(cmath.exp(-1j*k*totDist))
                     lx.append(BSx[t])
                     ly.append(BSy[t])                
                     lx.append(hitX)
                     ly.append(hitY)
                     lx.append(MSx[r])
                     ly.append(MSy[r])
+            H[ts,t,r] = sum(ray)    
     # The file in which outputs for each snapshot are stored
-    file = "../Output/Timestep"+str(ts).zfill(7)+".nc"
+    file = "../Output/Timestep"+str(ts).zfill(7)+".nc" 
     SaveTimesteps(file,"Links","lx","ly",lx,ly)
     lx.clear()
     ly.clear()
+            
+# Eigenvalues and Capacity Calculation
+Neigens = min(N_Rx,N_Tx)                                                        
+eigens = np.zeros((Neigens,Nsnapshots))
+for j in range (Nsnapshots):
+    # Singular values for each snapshot
+    s = np.linalg.svd(H[j,:,:], full_matrices=False,compute_uv=False)           
+    eigens[:,j] = s
+# Eigenvalues
+eigens = eigens**2 
+eigens[:]+=1e-13   
+timeaxis = np.zeros(Nsnapshots)
+for i in range (Nsnapshots):
+    timeaxis[i] = parameters.ts*i
+plot1 = plt.figure(1)
+plt.plot(timeaxis,10*np.log(eigens[0,:]),'k') 
+plt.plot(timeaxis,10*np.log(eigens[1,:]),'r')
+plt.title('Eigenvalues with time')
+plt.xlabel('Time [s]')
+plt.ylabel('Eigenvalues [dB]')
+plt.grid()
 
-                    
+SNR = 20                                                                        # Signal to Noise Ratio in [dB]
+snr = 10**(SNR/10)                                                              # Linear scale SNR
+CSISO = np.log2(1+snr*H[:,1,1])                                                 # SISO Ergodic Capacity using only the first channel
+CMIMO = sum(np.log2(1+(snr/Neigens)*eigens))                                    # MIMO Capacity 
+
+plot2 = plt.figure(2)
+CapS, = plt.plot(timeaxis,CSISO,label="SISO Capacity")
+first_legend = plt.legend(handles=[CapS], loc='lower right')
+ax = plt.gca().add_artist(first_legend)
+CapM, = plt.plot(timeaxis,CMIMO,label='MIMO Capacity')
+plt.legend(handles=[CapM], loc='upper right')
+plt.title('Channel Capacity with time')
+plt.xlabel('Time [s]')
+plt.ylabel('Capacity [bits/sec/Hz]')
+plt.grid()
+
+
+plt.show()
+
+
+plt.show()
+
