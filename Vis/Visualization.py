@@ -2,14 +2,16 @@
 import netCDF4 as nc
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
+import sys,re,os
 
 
-if (len(sys.argv))<2:
-    print("Usage: ./Visulation.py <input file of Raytracer >")
+if (len(sys.argv))<3:
+    print("Usage: ./Visulation.py  <SimulationSetup.nc> <Timestep???.nc>")
     sys.exit()
 filename = sys.argv[1] 
+tsfilename = sys.argv[2] 
 
+### Read SimulationSetUp.nc file
 fh = nc.Dataset(filename, mode='r')
 
 # BS Layout : BS Antennas Position
@@ -61,12 +63,23 @@ SCy = fh.variables['SCposy'][:]
 plot1 = plt.figure(1)
 plt.scatter(SCx, SCy, s=0.5)
 
+fh.close()
+### 
+
+### Read Timestep???.nc file
+tsfile = nc.Dataset(tsfilename, mode='r')
+
 # Achieved Links
 plot1 = plt.figure(1)
-lx = fh.variables['lx'][:]
-ly = fh.variables['ly'][:]
-plt.plot(lx,ly,linewidth= 0.2)
+lx = tsfile.variables['lx'][:]
+ly = tsfile.variables['ly'][:]
+plt.plot(lx,ly,"r",linewidth= 0.1)
+imagename = int(re.search(r'\d+', tsfilename).group(0)) # get the int part of a string (filename)
+imagename = str(imagename).zfill(7)
+# Create the Snaps Directory into Vis Directory if does not exist
+if not os.path.exists("../Vis/Snaps"):
+    os.makedirs("../Vis/Snaps")
+plt.savefig("Snaps/"+imagename+".png",dpi=300)
 
-
-fh.close()
+###
 plt.show()

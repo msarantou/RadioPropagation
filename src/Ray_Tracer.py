@@ -1,4 +1,3 @@
-# 2D Ray Tracing Single Bounce
 #!/usr/local/bin/python3
 import numpy as np
 from numpy import sin ,cos ,sqrt,arccos,arctan
@@ -11,12 +10,16 @@ import config
 import pair as pr
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-import sys
-from Output import Save, OpenFile
+import sys,os
+from Output import Save, OpenFile, SaveTimesteps
 import netCDF4 as nc
 
-# The file in which all outputs are stored
-file="../Output/Output.nc"
+# Create the Output Directory if does not exist
+if not os.path.exists("../Output"):
+    os.makedirs("../Output")
+
+# The file in which outputs related to the simulation layout are stored
+file = "../Output/SimulationSetUp.nc"
 
 ## Basic parameters for the simulation: Call for Simulation_Par Class 
 parameters = sp.SimulationParameters(config.fc,config.F,config.V,config.dist)                        
@@ -68,7 +71,6 @@ Save(file,"Total_Rays","atheta","U",config.atheta,U)
 thetaInterval = rays.thetaHPBW
 Save(file,"Transmitted_Rays","thetaInterval","None",thetaInterval,None)
 
-total = 0
 # Check for Intersection Point between Tx - Scatterer
 # The total number of Transmitted Rays:
 Nrays = len(thetaInterval)
@@ -103,23 +105,28 @@ dist_BS_SC_MS = []
 lx=[]
 ly=[]
 bounce = False 
-# plot1 = plt.figure(1)
-for t in range (N_Tx):
-    for r in range (N_Rx):
-        for i in range (len(P[t].data)):
-            xx,yy = rays.intersection(P[t].data[i].get(),Br[t].data[i].get(),[MSx[r],MSy[r]],rx.r,bounce)
-            if (xx!=False):
-                hitX,hitY = P[t].data[i].get()
-                distSC_MT = (sqrt(((hitX-MSx)**2) + ((hitY-MSy)**2)))
-                dist_BS_SC_MS.append(pr.MyPair("Tx"+str(t),"Rx"+str(r)))
-                totDist = distBS_SC[t].data[i].get()[0]+distSC_MT 
-                dist_BS_SC_MS[-1].makepair(totDist,None)
-                lx.append(BSx[t])
-                ly.append(BSy[t])                
-                lx.append(hitX)
-                ly.append(hitY)
-                lx.append(MSx[r])
-                ly.append(MSy[r])
-Save(file,"Links","lx","ly",lx,ly)
-                
+Nsnapshots = parameters.Nsamples 
+for ts in tqdm(range(Nsnapshots)):
+    for t in range (N_Tx):
+        for r in range (N_Rx):
+            for i in range (len(P[t].data)):
+                xx,yy = rays.intersection(P[t].data[i].get(),Br[t].data[i].get(),[rx.C[r,ts,0],rx.C[r,ts,1]],rx.r,bounce)
+                if (xx!=False):
+                    hitX,hitY = P[t].data[i].get()
+                    distSC_MT = (sqrt(((hitX-MSx)**2) + ((hitY-MSy)**2)))
+                    dist_BS_SC_MS.append(pr.MyPair("Tx"+str(t),"Rx"+str(r)))
+                    totDist = distBS_SC[t].data[i].get()[0]+distSC_MT 
+                    dist_BS_SC_MS[-1].makepair(totDist,None)
+                    lx.append(BSx[t])
+                    ly.append(BSy[t])                
+                    lx.append(hitX)
+                    ly.append(hitY)
+                    lx.append(MSx[r])
+                    ly.append(MSy[r])
+    # The file in which outputs for each snapshot are stored
+    file = "../Output/Timestep"+str(ts).zfill(7)+".nc"
+    SaveTimesteps(file,"Links","lx","ly",lx,ly)
+    lx.clear()
+    ly.clear()
+
                     
