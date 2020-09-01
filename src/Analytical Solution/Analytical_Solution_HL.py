@@ -1,8 +1,8 @@
 """
 Capacity Analytical Solution:
 
-3x3 MIMO at 2GHz. Antenna arrays are allocated along y-axis with spacing = λ. BS is stable [-500,0,0](m) 
-and MT moves along x-axis with initial position [-2,0,0](m), making a straight line journey of total length 
+3x3 MIMO at 2GHz using Clarke's model. Antenna arrays are allocated along y-axis with spacing = λ. BS is stable 
+[-500,0,0](m) and MT moves along x-axis with initial position [-2,0,0](m), making a straight line journey of total length 
 5(m) and constant velocity 10(m/s). 100 Scatterers are randomly distributed in the 2D space (x,y) over a circle 
 of radius 100 (m) and center [0,0]. Assuming SNR equal to 20[dB] the Channel Capacity is calculated and plotted 
 with time. The "Uninformed Channel Capacity" approach is assumed.
@@ -108,9 +108,9 @@ timeaxis = np.zeros(snapshots)
 for i in range (snapshots):
     timeaxis[i] = parameters.ts*i
 plot5 = plt.figure(5)
-plt.plot(timeaxis,10*np.log(eigens[0,:])) 
-plt.plot(timeaxis,10*np.log(eigens[1,:]))
-plt.plot(timeaxis,10*np.log(eigens[2,:]))
+plt.plot(timeaxis,10*np.log(eigens[0,:]),'b') 
+plt.plot(timeaxis,10*np.log(eigens[1,:]),'r')
+plt.plot(timeaxis,10*np.log(eigens[2,:]),'y')
 plt.title('Eigenvalues with time')
 plt.xlabel('Time [s]')
 plt.ylabel('Eigenvalues [dB]')
@@ -118,7 +118,7 @@ plt.grid()
 
 SNR = 20                                                                        # Signal to Noise Ratio in [dB]
 snr = 10**(SNR/10)                                                              # Linear scale SNR
-CSISO = np.log2(1+snr*H[1,1,:])                                                 # SISO Ergodic Capacity using only the first channel
+CSISO = np.log2(1+snr*(H[1,1,:]**2))                                            # SISO Ergodic Capacity using only the first channel
 CMIMO = sum(np.log2(1+(snr/Neigens)*eigens))                                    # MIMO Capacity 
 
 plot6 = plt.figure(6)
