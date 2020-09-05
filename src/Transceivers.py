@@ -16,8 +16,12 @@
    * Function elementPositionsCalc()
      Allocate the array's antennas (only along y axis) in the 3D cartesian space for the Tx/Rx, 
      in respect to the antenna spacing and Tx/Rx initial position.
-        elementPositions: a vector [x,y,z] which contains the position of each array's antenna allocated along y axis
-
+        elementPositions: a vector [x,y] which contains the position of each array's antenna allocated along y axis
+    
+   * Function Track()
+     Calculates the MT's track.
+        track: a vector [x,y] which contains the positions of the MT along its track for each antenna element
+    
 """
 
 import numpy as np
@@ -52,8 +56,7 @@ class Transceiver():
         if (self.mode == 1):
 
           self.r = (2*(self.lamda/2)**2)/self.lamda
-          # self.r = 11
-          # self.C = self.elementPositions
+          
     
     def Track(self):
     

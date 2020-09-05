@@ -29,7 +29,7 @@ theta = fh.variables['theta'][:]
 P = fh.variables['P'][:]
 plot2 = plt.figure(2)
 plt.plot(theta*180/np.pi,P)
-plt.title('Radiated Power with Elevation Angle')
+plt.title('Radiated Power versus Elevation Angle')
 plt.xlabel('Theta [deg°]')
 plt.ylabel('P [W]')
 plt.grid()

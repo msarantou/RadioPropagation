@@ -104,15 +104,15 @@ for t in tqdm(range (N_Tx)):
 # Check for Intersection Point between Scatterer - Receiver
 lx=[]
 ly=[]
-# Signal's complex envelope:
-ray = []
 bounce = False 
 Nsnapshots = parameters.Nsamples 
-# Channel Matrrix:
+# Channel Matrix H:
 H = np.zeros((Nsnapshots,N_Tx,N_Rx),dtype=complex)
 for ts in tqdm(range(Nsnapshots)):
     for t in range (N_Tx):
         for r in range (N_Rx):
+            # Signal's complex envelope:
+            ray = []
             for i in range (len(P[t].data)):
                 xx,yy = rays.intersection(P[t].data[i].get(),Br[t].data[i].get(),[rx.C[r,ts,0],rx.C[r,ts,1]],rx.r,bounce)
                 if (xx!=False):
@@ -147,16 +147,18 @@ timeaxis = np.zeros(Nsnapshots)
 for i in range (Nsnapshots):
     timeaxis[i] = parameters.ts*i
 plot1 = plt.figure(1)
-plt.plot(timeaxis,10*np.log(eigens[0,:]),'k') 
+plt.plot(timeaxis,10*np.log(eigens[0,:]),'b') 
 plt.plot(timeaxis,10*np.log(eigens[1,:]),'r')
-plt.title('Eigenvalues with time')
+plt.plot(timeaxis,10*np.log(eigens[2,:]),'y')
+
+plt.title('Eigenvalues versus time')
 plt.xlabel('Time [s]')
 plt.ylabel('Eigenvalues [dB]')
 plt.grid()
-
+plt.savefig("Eigenvalues1.png",dpi=300)
 SNR = 20                                                                        # Signal to Noise Ratio in [dB]
 snr = 10**(SNR/10)                                                              # Linear scale SNR
-CSISO = np.log2(1+snr*H[:,1,1])                                                 # SISO Ergodic Capacity using only the first channel
+CSISO = np.log2(1+snr*(H[:,1,1]**2))                                                 # SISO Ergodic Capacity using only the first channel
 CMIMO = sum(np.log2(1+(snr/Neigens)*eigens))                                    # MIMO Capacity 
 
 plot2 = plt.figure(2)
@@ -165,13 +167,11 @@ first_legend = plt.legend(handles=[CapS], loc='lower right')
 ax = plt.gca().add_artist(first_legend)
 CapM, = plt.plot(timeaxis,CMIMO,label='MIMO Capacity')
 plt.legend(handles=[CapM], loc='upper right')
-plt.title('Channel Capacity with time')
+plt.title('Channel Capacity versus time')
 plt.xlabel('Time [s]')
 plt.ylabel('Capacity [bits/sec/Hz]')
 plt.grid()
-
-
-plt.show()
+plt.savefig("Capacity1.png",dpi=300)
 
 
 plt.show()
